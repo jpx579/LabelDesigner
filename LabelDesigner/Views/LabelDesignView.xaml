@@ -1,0 +1,145 @@
+﻿<UserControl x:Class="LabelDesigner.Views.LabelDesignView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LabelDesigner.Views"       
+             xmlns:conv="clr-namespace:LabelDesigner.Converters"
+             xmlns:viewModels="clr-namespace:LabelDesigner.ViewModels"
+             mc:Ignorable="d"  Height="800" Width="1200">
+
+    <UserControl.DataContext>
+        <viewModels:LabelDesignViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <conv:SelectedBorderConverter x:Key="SelectedBorderConverter"/>
+        <conv:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+        <conv:TextTypeConverter x:Key="TextTypeConverter" />
+        <conv:BarcodeTypeConverter x:Key="BarcodeTypeConverter" />
+    </UserControl.Resources>
+    <DockPanel Background="#F0F0F0">
+
+        <!-- 左侧工具栏 -->
+        <StackPanel DockPanel.Dock="Left" Width="180" Background="#EEE" Margin="5">
+            <TextBlock Text="标签操作" FontWeight="Bold" Margin="5"/>
+            <Button Content="添加标签" Command="{Binding AddPrintLabelCommand}" Margin="5" Height="30" Width="160"/>
+            <Button Content="删除标签" Command="{Binding DeleteLabelCommand}" Margin="5" Height="30" Width="160"/>
+            <ComboBox ItemsSource="{Binding LabelNames}" SelectedItem="{Binding SelectedLabel, Mode=TwoWay}" Margin="5"/>
+
+            <Separator Margin="5"/>
+
+            <TextBlock Text="元素操作" FontWeight="Bold" Margin="5"/>
+            <Button Content="添加元素" Command="{Binding AddElementCommand}" Margin="5" Height="30" Width="160"/>
+            <Button Content="删除元素" Command="{Binding DeleteElementCommand}" CommandParameter="{Binding SelectedElement}" Margin="5" Height="30" Width="160"/>
+
+            <Separator Margin="5"/>
+
+            <TextBlock Text="标签设置" FontWeight="Bold" Margin="5"/>
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="DPI" VerticalAlignment="Center"  Width="50"/>
+                <ComboBox SelectedItem="{Binding SelectedDpi, Mode=TwoWay}" ItemsSource="{Binding DpiList}" Width="100" Margin="5,0,0,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="宽(mm)" VerticalAlignment="Center"  Width="50"/>
+                <TextBox Text="{Binding LabelWidthMm, Mode=TwoWay}" Width="100" Margin="5,0,0,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="高(mm)" VerticalAlignment="Center"   Width="50"/>
+                <TextBox Text="{Binding LabelHeightMm, Mode=TwoWay}" Width="100" Margin="5,0,0,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="宽(px)" VerticalAlignment="Center"  Width="50"/>
+                <TextBox Text="{Binding CanvasWidth, Mode=TwoWay}" IsEnabled="False" Width="100" Margin="5,0,0,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="高(px)" VerticalAlignment="Center"  Width="50"/>
+                <TextBox Text="{Binding CanvasHeight, Mode=TwoWay}" IsEnabled="False" Width="100" Margin="5,0,0,0"/>
+            </StackPanel>
+
+            <TextBlock Text="打印机选择" FontWeight="Bold" Margin="5"/>
+            <ComboBox ItemsSource="{Binding PrinterList}" SelectedItem="{Binding SelectedPrinter}" Width="160" Margin="5"/>
+
+            <Button Command="{Binding SaveLayoutCommand}" Content="保存布局" Height="40" Width="160" Margin="10"/>
+            <Button Command="{Binding PrintLayoutCommand}" Content="打印标签" Height="40" Width="160" Margin="10"/>
+        </StackPanel>
+
+        <!-- 右侧属性面板 -->
+        <StackPanel DockPanel.Dock="Right" Width="220" Background="#F8F8F8" Margin="5">
+            <TextBlock Text="选中元素属性" FontWeight="Bold" Margin="5"/>
+            <StackPanel Margin="5">
+                <TextBlock Text="唯一ID"/>
+                <TextBox Text="{Binding SelectedElement.Name, Mode=TwoWay}" Margin="0,3"/>
+                <TextBlock Text="类型"/>
+                <ComboBox ItemsSource="{Binding AvailableBarcodeTypes}"
+                       SelectedItem="{Binding SelectedElement.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,3"/>
+                <TextBlock Text="内容"/>
+                <TextBox Text="{Binding SelectedElement.Content, Mode=TwoWay}" Margin="0,3"/>
+                <TextBlock Text="宽(mm)"/>
+                <TextBox Text="{Binding SelectedElement.Width, Mode=TwoWay}" Margin="0,3"/>
+                <TextBlock Text="高(mm)"/>
+                <TextBox Text="{Binding SelectedElement.Height, Mode=TwoWay}" Margin="0,3"/>
+                <TextBlock Text="字体大小"/>
+                <TextBox Text="{Binding SelectedElement.FontSize, Mode=TwoWay}" Margin="0,3"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- 中间画布 -->
+        <Border Background="Gray" Margin="5">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Canvas x:Name="DesignCanvas" 
+                     Width="{Binding CanvasWidth}" 
+                     Height="{Binding CanvasHeight}" 
+                     Background="White">
+                    <ItemsControl ItemsSource="{Binding LabelElements}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{Binding XUnitPx, Mode=OneWay}"/>
+                                <Setter Property="Canvas.Top"  Value="{Binding YUnitPx, Mode=OneWay}"/>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="{Binding WidthUnit}" Height="{Binding HeightUnit}" BorderThickness="2" BorderBrush="{Binding IsSelected, Converter={StaticResource BoolToBrushConverter}}">
+                                    <Grid 
+                                    MouseLeftButtonDown="Element_MouseLeftButtonDown"
+                                    MouseMove="Element_MouseMove"
+                                    MouseLeftButtonUp="Element_MouseLeftButtonUp"
+                                    Background="Transparent">
+
+                                        <Image Source="{Binding ImageSourceData}" Stretch="Fill" 
+                                            Visibility="{Binding Type, Converter={StaticResource BarcodeTypeConverter}}"/>
+
+                                        <TextBlock Text="{Binding Content}" FontSize="{Binding FontSize}" 
+                                                HorizontalAlignment="Center" VerticalAlignment="Center"  
+                                                Visibility="{Binding Type, Converter={StaticResource TextTypeConverter}}"/>
+
+                                        <!-- 右下角缩放手柄 -->
+                                        <Thumb Width="12" Height="12"
+                                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                            Margin="0,0,-6,-6"
+                                            Cursor="SizeNWSE"
+                                            PreviewMouseLeftButtonDown="ResizeThumb_PreviewMouseLeftButtonDown"
+                                            DragDelta="ResizeThumb_DragDelta"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Canvas>
+            </ScrollViewer>
+        </Border>
+    </DockPanel>
+</UserControl>

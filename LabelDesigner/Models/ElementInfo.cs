@@ -59,10 +59,8 @@ public partial class ElementInfo : ObservableObject
         OnPropertyChanged(nameof(HeightUnit)); 
         UpdateImage(Dpi);
     }
-
     partial void OnTypeChanged(BarcodeType oldValue, BarcodeType newValue) => UpdateImage(Dpi);
     partial void OnContentChanged(string value) => UpdateImage(Dpi);
-
     public void UpdateImage(double dpi)
     {
         if (string.IsNullOrWhiteSpace(Content) && Type != BarcodeType.Text)
@@ -125,8 +123,6 @@ public partial class ElementInfo : ObservableObject
         finalBmp.Save("111.png");
         ImageSourceData = BitmapToImageSource(finalBmp);
     }
-
-
     private ImageSource RenderTextToImage(string text, double widthMm, double heightMm, double fontSize, double dpi)
     {
         int pxWidth = (int)Math.Round(widthMm * dpi / 25.4);
@@ -158,7 +154,6 @@ public partial class ElementInfo : ObservableObject
         rtb.Freeze();
         return rtb;
     }
-
     private ImageSource BitmapToImageSource(Bitmap bitmap)
     {
         using var stream = new MemoryStream();

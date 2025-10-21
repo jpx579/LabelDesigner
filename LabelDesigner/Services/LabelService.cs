@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using LabelDesigner.Enums;
 using LabelDesigner.Models;
 using Brushes = System.Windows.Media.Brushes;
@@ -27,7 +28,44 @@ public static class LabelService
         var json = File.ReadAllText(filePath);
         return JsonSerializer.Deserialize<LabelModel>(json) ?? throw new Exception("读取失败");
     }
-   
+    /// <summary>
+    /// 如果需要热更新标签中的内容
+    /// 1.先调用GetLabelElementDic获取标签需要热更新的键值对
+    /// 2.替换实际的数据
+    /// 3.发送PrintLabel打印
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
+    public static Dictionary<string, string> GetLabelElementDic(string filePath) 
+    {
+        Dictionary<string, string> dic = new Dictionary<string, string>();
+        LabelModel labelModel = LoadLabel(filePath);
+        foreach (var item in labelModel.LabelElements)
+        {
+            if (!string.IsNullOrWhiteSpace(item.Name))
+            {
+                dic.Add(item.Name, "123456");
+            }
+        }
+        return dic;
+    }
+
+    public static bool PrintLabel(string filePath, Dictionary<string, string> data, string printerName, out string message, double marginMm = 1.0)
+    {
+        try
+        {
+            LabelModel labelModel = LoadLabel(filePath);
+            ApplyDataToLabelAndPrint(labelModel, data, printerName, marginMm);
+            message = "打印成功";
+            return true;
+        }
+        catch (Exception ex)
+        {
+            message = $"打印失败：{ex}";
+            return false;
+        }      
+    }
+
     /// <summary>
     ///  打印标签
     /// </summary>
@@ -121,6 +159,39 @@ public static class LabelService
         canvas.UpdateLayout();
 
         pd.PrintVisual(canvas, "打印标签");
+
+        SaveCanvasToImage(canvas,"1.png");
+    }
+  
+    /// <summary>
+    /// 保存打印机图片
+    /// </summary>
+    /// <param name="canvas"></param>
+    /// <param name="filePath"></param>
+    /// <param name="dpi"></param>
+    public static void SaveCanvasToImage(Canvas canvas, string filePath, double dpi = 300)
+    {
+        if (canvas == null) return;
+
+        canvas.Measure(new Size(canvas.Width, canvas.Height));
+        canvas.Arrange(new Rect(new Size(canvas.Width, canvas.Height)));
+        canvas.UpdateLayout();
+
+        var rtb = new RenderTargetBitmap(
+            (int)Math.Round(canvas.Width * dpi / 96.0),
+            (int)Math.Round(canvas.Height * dpi / 96.0),
+            dpi, dpi,
+            PixelFormats.Pbgra32);
+
+        rtb.Render(canvas);
+
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(rtb));
+
+        using (var fs = new FileStream(filePath, FileMode.Create))
+        {
+            encoder.Save(fs);
+        }
     }
 
     /// <summary>
