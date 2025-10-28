@@ -28,7 +28,7 @@ namespace LabelDesigner.Views
             try
             {
                 // 创建 PrintLabels 文件夹路径
-                string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configs//PrintLabels");
+                string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PrintLabels");
                 if (!Directory.Exists(folderPath))
                     Directory.CreateDirectory(folderPath);
 

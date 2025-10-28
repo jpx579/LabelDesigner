@@ -12,7 +12,7 @@ namespace LabelDesigner.ViewModels
     public partial class LabelDesignViewModel : ObservableObject
     {
         public IEnumerable<BarcodeType> AvailableBarcodeTypes => Enum.GetValues<BarcodeType>();
-        private readonly string _labelFolderPath = "Configs//PrintLabels";
+        private readonly string _labelFolderPath = "PrintLabels";
         private const double WpfDpi = 96.0;
 
         [ObservableProperty] private int selectedDpi = 300;

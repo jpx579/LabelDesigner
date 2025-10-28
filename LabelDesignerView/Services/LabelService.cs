@@ -12,7 +12,6 @@ using Image = System.Windows.Controls.Image;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 
-namespace LabelDesigner.Services;
 public static class LabelService
 {
     // 保存 JSON
@@ -50,15 +49,7 @@ public static class LabelService
         }
         return dic;
     }
-    /// <summary>
-    /// Nuget库  调用此方法打印
-    /// </summary>
-    /// <param name="filePath"></param>
-    /// <param name="data"></param>
-    /// <param name="printerName"></param>
-    /// <param name="message"></param>
-    /// <param name="marginMm"></param>
-    /// <returns></returns>
+
     public static bool PrintLabel(string filePath, Dictionary<string, string> data, string printerName, out string message, double marginMm = 1.0)
     {
         try
