@@ -9,7 +9,7 @@
 
 		<EnableDynamicLoading>true</EnableDynamicLoading>
 		<PackageId>LabelDesignerPrint_JPX</PackageId>
-		<Version>3.1.0</Version>
+		<Version>3.2.0</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Authors>贾鹏旭</Authors>
 		<Product>标签设计及打印</Product>
@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="C:\Users\贾鹏旭\Desktop\readme.md">
+		<None Include="D:\jiapengxu\LabelDesigner\LabelDesigner\bin\Debug\readme.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>

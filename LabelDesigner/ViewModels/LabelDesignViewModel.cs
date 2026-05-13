@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LabelDesigner.Enums;
 using LabelDesigner.Models;
+using LabelDesigner.Services;
 using LabelDesigner.Views;
 
 namespace LabelDesigner.ViewModels
@@ -128,7 +129,7 @@ namespace LabelDesigner.ViewModels
                                      .ToList();
 
                 LabelNames.Clear();
-                foreach (var name in files)
+                foreach (var name in files.Where(s => !string.IsNullOrWhiteSpace(s)))
                     LabelNames.Add(name);
 
                 if (LabelNames.Count > 0)
